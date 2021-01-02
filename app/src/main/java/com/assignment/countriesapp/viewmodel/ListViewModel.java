@@ -11,14 +11,15 @@ import androidx.lifecycle.ViewModel;
 
 public class ListViewModel extends ViewModel {
 
-    MutableLiveData<List<CountryModel>> country;
-    MutableLiveData<Boolean> countryLoadErr;
-    MutableLiveData<Boolean> loading;
+    public MutableLiveData<List<CountryModel>> country=new MutableLiveData<>();
+    public MutableLiveData<Boolean> countryLoadErr=new MutableLiveData<>();
+    public MutableLiveData<Boolean> loading=new MutableLiveData<>();
 
     public void refresh() {
+        fetchData();
     }
 
-    public void fetchData() {
+    private void fetchData() {
         CountryModel country1 = new CountryModel("India", "Delhi", "");
         CountryModel country2 = new CountryModel("Nepal", "Kathmandu", "");
         CountryModel country3 = new CountryModel("Bang", "kL", "");
