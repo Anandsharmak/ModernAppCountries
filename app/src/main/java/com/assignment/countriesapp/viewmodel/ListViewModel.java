@@ -1,5 +1,8 @@
 package com.assignment.countriesapp.viewmodel;
 
+import android.util.Log;
+
+import com.assignment.countriesapp.model.CountriesService;
 import com.assignment.countriesapp.model.CountryModel;
 
 import java.lang.reflect.Array;
@@ -8,6 +11,12 @@ import java.util.List;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
 
 public class ListViewModel extends ViewModel {
 
@@ -15,21 +24,46 @@ public class ListViewModel extends ViewModel {
     public MutableLiveData<Boolean> countryLoadErr=new MutableLiveData<>();
     public MutableLiveData<Boolean> loading=new MutableLiveData<>();
 
+    public CountriesService service=CountriesService.getInstance();
+    public CompositeDisposable disposable=new CompositeDisposable();
     public void refresh() {
         fetchData();
     }
 
     private void fetchData() {
-        CountryModel country1 = new CountryModel("India", "Delhi", "");
-        CountryModel country2 = new CountryModel("Nepal", "Kathmandu", "");
-        CountryModel country3 = new CountryModel("Bang", "kL", "");
+        loading.setValue(true);
+        disposable.add(
+            service.getCountries()
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<List<CountryModel>>() {
+                        @Override
+                        public void onSuccess(List<CountryModel> countryModels) {
+                            countryLoadErr.setValue(false);
+                            loading.setValue(false);
+                            country.setValue(countryModels);
+                        }
 
-        List<CountryModel> list = new ArrayList<>();
-        list.add(country1);
-        list.add(country2);
-        list.add(country3);
-        country.setValue(list);
-        countryLoadErr.setValue(false);
-        loading.setValue(false);
+                        @Override
+                        public void onError(Throwable e) {
+                            countryLoadErr.setValue(true);
+                            loading.setValue(false);
+                            Log.e(this.getClass().toString(),"Error "+e);
+                            e.printStackTrace();
+                        }
+                    })
+            );
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        disposable.clear();
     }
 }
+
+
+
+
+
+
