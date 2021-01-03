@@ -40,9 +40,7 @@ public class CountryListAdapter extends RecyclerView.Adapter<CountryListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull CountryListViewHolder holder, int position) {
-        holder.getCapitalName().setText(list.get(position).getCapital());
-        holder.getCountryName().setText(list.get(position).getName());
-        //holder.getCountryImage().setBackground(list.get(position).getFlag());
+        holder.bind(list.get(position));
     }
 
     @Override
@@ -66,16 +64,11 @@ public class CountryListAdapter extends RecyclerView.Adapter<CountryListAdapter.
             capitalName=itemView.findViewById(R.id.capital_name);
         }
 
-        public ImageView getCountryImage() {
-            return countryImage;
-        }
-
-        public TextView getCountryName() {
-            return countryName;
-        }
-
-        public TextView getCapitalName() {
-            return capitalName;
+        void bind(CountryModel countryModel){
+            Utils.getImage(countryImage,countryModel.getFlag(),
+                    Utils.getProgressDrawable(countryImage.getContext()));
+            countryName.setText(countryModel.getName());
+            capitalName.setText(countryModel.getCapital());
         }
     }
 }

@@ -45,7 +45,13 @@ public class MainActivity extends AppCompatActivity {
         listViewModel= ViewModelProviders.of(this).get(ListViewModel.class);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         listViewModel.refresh();
-
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                listViewModel.refresh();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
         observeViewModel();
 
 
